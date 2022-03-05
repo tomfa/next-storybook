@@ -1,9 +1,15 @@
 const fs = require('fs')
 
 const SUPPORTED_FILE_EXT = ['tsx', 'jsx']
+const EXCLUDED_FILES = [];
+const EXCLUDED_FOLDERS = ['src/themes'];
 
-const fileExists = (path) => {
+const pathExists = (path) => {
   return fs.existsSync(path)
+}
+
+const isDir = (dirPath) => {
+  return fs.lstatSync(dirPath).isDirectory();
 }
 
 const getStoryContent = (componentName) => {
@@ -27,8 +33,12 @@ const writeFile = ({ path, content }) => {
   fs.writeFileSync(path, content);
 }
 
+const getStoryPath = (componentPath) => {
+  return splitPath(componentPath).storyPath
+}
+
 const splitPath = (path) => {
-  if (!fileExists(path)) {
+  if (!pathExists(path)) {
     throw new Error(`Can not find ${path}`)
   }
   const relativePath = path.split('/').reverse()[0]
@@ -49,18 +59,53 @@ const splitPath = (path) => {
   }
 }
 
-const generateTemplate = (path, overwrite = false) => {
-  if (!fileExists(path)) {
+const generateTemplate = async (path, overwrite = false) => {
+  console.log(`Generating story for ${path}`)
+  if (!pathExists(path)) {
     throw new Error(`Can not find ${path}`)
   }
   const {storyPath, componentName, ext} =  splitPath(path);
-  if (fileExists(storyPath && !overwrite)) {
+  if (pathExists(storyPath && !overwrite)) {
     throw new Error(`Story ${storyPath} already exists`)
   }
 
   const content = getStoryContent(componentName)
   writeFile({ path: storyPath, content })
   console.log(`Wrote new story ${storyPath}. Remember to specify args`)
+}
+
+const readDir = async (path) => {
+  return new Promise((resolve, reject) => fs.readdir(path, (err, data) => err ? reject(err): resolve(data)))
+}
+
+const isSupportedFile = (path) => {
+  const ext = path.split('.').reverse()[0];
+  const isStory = path.split('.').reverse()[1] === 'stories';
+
+  return !isStory && SUPPORTED_FILE_EXT.includes(ext);
+}
+
+const doesNotHaveStory = path => {
+  const storyPath = getStoryPath(path);
+  return !fs.existsSync(storyPath)
+}
+
+
+const getAllFilesInDir = async (dirPath) => {
+  const allFiles = (await readDir(dirPath)).map(dir => `${dirPath}/${dir}`)
+  const directories = allFiles.filter(isDir).filter(dir => !EXCLUDED_FOLDERS.includes(dir))
+  const subdirFileLists = await Promise.all(directories.map(getAllFilesInDir));
+  const filesInSubdir = subdirFileLists.reduce((all, subdir) => all.concat(subdir), []);
+  const filesHere = allFiles.filter(isSupportedFile).filter(doesNotHaveStory)
+  return filesHere.concat(filesInSubdir).filter(path => !EXCLUDED_FILES.includes(path))
+}
+
+const generateTemplateForFilesInDir = async (dirPath) => {
+  const files = await getAllFilesInDir(dirPath);
+  if (files.length === 0) {
+    console.log(`Found 0 files to generate stories for`)
+  }
+  await files.map(generateTemplate)
 }
 
 if (require.main === module) {
@@ -71,9 +116,14 @@ if (require.main === module) {
   }
 
   const path = args[2];
-  const overwrite = args.length > 3 && args.includes('-f')
+  if (!isDir(path)) {
+    const overwrite = args.length > 3 && args.includes('-f')
+    generateTemplate(path, overwrite)
+    return
+  }
+  console.log(`Generating stories for all files in ${path}`)
+  generateTemplateForFilesInDir(path);
 
-  generateTemplate(path, overwrite)
 }
 
 
