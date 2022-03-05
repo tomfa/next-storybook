@@ -106,14 +106,30 @@ import { Meta } from '@storybook/addon-docs';
   
 `}</style>
 
-# Konfidens design system
+# Introduction to your design system
 
-This is temporary page that can be a starting point for Konfidens' design system. It uses Storybook, which helps us build UI components in isolation from your app's business logic, data, and context.
+This is temporary page that can be a starting point for your design system. It uses Storybook, which helps us build UI components in isolation from your app's business logic, data, and context.
 That makes it easy to develop hard-to-reach states. Save these UI states as **stories** to revisit during development, testing, or QA.
 
 You can find and create stories by making a `.stories.tsx` file. We try to keep them close to the source code, preferably in the same folder.
 
 We recommend building UIs with a [**component-driven**](https://componentdriven.org) process starting with atomic components and ending with pages.
+
+### Generating stories automatically
+
+A template story can be generated with **`yarn storybook:generate [path]`**, e.g.
+
+Generates a dummy story for a component
+```
+yarn storybook:generate src/components/Dropdown.tsx
+```
+Generate dummy stories for all components in folder, ignoring those already with a story
+```
+yarn storybook:generate src/components
+```
+
+
+
 
 <div className="subheading">Configure</div>
 
