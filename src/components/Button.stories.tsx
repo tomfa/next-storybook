@@ -2,10 +2,7 @@ import React from 'react';
 import { Meta } from '@storybook/react';
 import Component from './Button';
 
-export default {
-  title: 'components/buttons/Button',
-  component: Component,
-} as Meta;
+export default { component: Component } as Meta;
 
 const Template = (props: React.ComponentProps<typeof Component>) => (
   <Component {...props} />

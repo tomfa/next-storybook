@@ -13,7 +13,14 @@ const addSupportForRelativeImportsFromSrcFolder = config => {
 }
 
 module.exports = {
-  stories: ['../src/**/*.stories.mdx', '../src/**/*.stories.@(js|jsx|ts|tsx)'],
+  stories: ['../src/**/*.stories.mdx', {
+    // 👇 The directory field sets the directory your stories
+    directory: '../src',
+    // 👇 The titlePrefix field will generate automatic titles for your stories
+    titlePrefix: '',
+    // 👇 Storybook will load all files that contain the stories extension
+    files: '**/*.stories.@(js|jsx|ts|tsx)',
+  }],
   addons: ['@storybook/addon-links', '@storybook/addon-essentials'],
   framework: '@storybook/react',
   core: {
