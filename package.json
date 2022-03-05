@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "storybook": "start-storybook -p 6006 -s public",
-    "storybook:build": "build-storybook -s ./public"
+    "storybook:build": "build-storybook -s ./public",
+    "storybook:generate": "node ./.storybook/generate-story.js"
   },
   "dependencies": {
     "next": "12.1.0",
