@@ -78,6 +78,12 @@ const readDir = async (path) => {
   return new Promise((resolve, reject) => fs.readdir(path, (err, data) => err ? reject(err): resolve(data)))
 }
 
+const startsWithCapitalLetter = (path) => {
+  const filename = path.split('/').reverse()[0];
+  const firstLetter = filename[0];
+  return firstLetter === firstLetter.toUpperCase();
+}
+
 const isSupportedFile = (path) => {
   const ext = path.split('.').reverse()[0];
   const isStory = path.split('.').reverse()[1] === 'stories';
@@ -96,7 +102,7 @@ const getAllFilesInDir = async (dirPath) => {
   const directories = allFiles.filter(isDir).filter(dir => !EXCLUDED_FOLDERS.includes(dir))
   const subdirFileLists = await Promise.all(directories.map(getAllFilesInDir));
   const filesInSubdir = subdirFileLists.reduce((all, subdir) => all.concat(subdir), []);
-  const filesHere = allFiles.filter(isSupportedFile).filter(doesNotHaveStory)
+  const filesHere = allFiles.filter(isSupportedFile).filter(doesNotHaveStory).filter(startsWithCapitalLetter)
   return filesHere.concat(filesInSubdir).filter(path => !EXCLUDED_FILES.includes(path))
 }
 
