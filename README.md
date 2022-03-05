@@ -20,10 +20,9 @@ yarn storybook:build
 ```
 
 ### Deploy storybook to gh-pages
-Deploy uses [gh-pages](https://npmjs.com/package/gh-pages) to deploy to your github repo.
-```
-yarn deploy
-```
+A Github CI [action](https://github.com/tomfa/next-storybook/blob/main/.github/workflows/deploy.yml) is added to automatically deploy the design system to [tomfa.github.io/next-storybook](https://tomfa.github.io/next-storybook/) when `main` brnach is updated.
+
+I recommend doing this for your project too! :)
 
 ## Generating stories automatically
 
